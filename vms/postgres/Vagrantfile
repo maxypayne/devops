@@ -1,0 +1,17 @@
+Vagrant.configure("2") do |config|
+    config.vm.box = "eurolinux-vagrant/centos-stream-9"
+
+    # Specify the network configuration (static IP and bridged)
+    config.vm.network "public_network", bridge: "eth0", auto_config: true # For bridged networking
+    config.vm.network "private_network", type: "static", ip: "192.168.56.10"  # Use your preferred fixed IP
+
+  config.vm.define "postgres" do |postgres|
+    postgres.vm.hostname = "postgres-vm"
+  end
+
+   # Set the provider (default: VirtualBox, can be changed)
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"  # Set the RAM for the VM (1GB)
+      vb.cpus = 2         # Set the number of CPUs
+    end
+end

@@ -1,0 +1,20 @@
+# Vagrantfile for Ubuntu VM with Docker and GitLab CE
+Vagrant.configure("2") do |config|
+  # Specify the box to use (Ubuntu 22.04 LTS in this case)
+  config.vm.box = "ubuntu/jammy64"
+
+ config.vm.define "gitlab" do |gitlab|
+    gitlab.vm.hostname = "gitlab"
+  end
+  # Customize the VM's resources
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "8196"      # Set memory size (in MB)
+    vb.cpus = 4             # Set number of CPUs
+  end
+
+  # Set up a private network with a static IP
+  config.vm.network "public_network", bridge: "eth0", auto_config: true # For bridged networking
+  config.vm.network "private_network", ip: "192.168.56.11"
+
+  config.vm.provision "shell", path: "provision.sh"
+end
