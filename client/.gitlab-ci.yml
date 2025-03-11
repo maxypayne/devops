@@ -1,0 +1,50 @@
+  # Image Node.js pour builder l'application
+stages:
+  - install
+  - build
+  - upload
+
+variables:
+  ANGULAR_ENV: production
+  DIST_PATH: dist/awesome-client
+  NEXUS_URL: "http://192.168.56.14:8081/repository/angular-app/"
+  NEXUS_USER: "admin"
+  NEXUS_PASSWORD: "maxypayne"
+
+# Use npm cache to avoid downloading dependencies in every run.
+#cache:
+#  key: "${CI_COMMIT_REF_SLUG}"
+#  paths:
+#    - node_modules/
+#    - ~/.npm  # Cache npm modules too
+#  policy: pull-push
+cache:
+  key: npm-cache
+  paths:
+    - node_modules/
+
+install:
+  stage: install
+  tags:
+    - angular
+  script:
+    - npm ci  # Installation propre des dépendances
+
+build:
+  stage: build
+  tags:
+    - angular
+  script:
+    - npm run build -- --configuration=$ANGULAR_ENV
+  artifacts:
+    paths:
+      - $DIST_PATH/
+    expire_in: 1h
+
+upload:
+  stage: upload
+  tags:
+    - angular
+  script:
+    - zip -r app.zip $DIST_PATH
+    - curl -v -u "$NEXUS_USER:$NEXUS_PASSWORD" --upload-file app.zip "$NEXUS_URL/app.zip"

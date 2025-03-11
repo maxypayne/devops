@@ -47,17 +47,22 @@ echo "GitLab CE installation complete. Access it at: $EXTERNAL_URL"
 echo "Installing GitLab runner"
 curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh" | sudo bash
 
+sudo apt install gitlab-runner -y
 
 sudo gitlab-runner register \
   --non-interactive \
   --url "http://192.168.56.11" \
-  --registration-token "GR1348941e8zzsuys1kX5XaDdB9cN" \
+  --registration-token "GR1348941E53nhQxbaEJxAqtd8P1_" \
   --description "This is my awesome project" \
   --tag-list "awesome" \
   --maintenance-note "just do it" \
   --executor "shell"
 
 sudo systemctl restart gitlab-runner
+sudo apt install openjdk-21-jdk -y
+
+echo "192.168.56.11 mlucov.gitlab.com" | sudo tee -a /etc/hosts
+
 
 
 #before_script:
@@ -65,3 +70,13 @@ sudo systemctl restart gitlab-runner
  #  - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
  #  - export PATH=$JAVA_HOME/bin:$PATH
  #  - echo "JAVA_HOME=$JAVA_HOME"
+
+# Create ssh key
+ssh-keygen -t rsa -b 4096 -C "mlucov@gitlab.com"
+
+
+# install ansible
+
+mkdir -p ~/ansible-deployment
+cd ansible-maintenance
+touch deploy.yml inventory

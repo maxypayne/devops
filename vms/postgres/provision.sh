@@ -18,7 +18,7 @@ sudo systemctl start postgresql-17
 sudo su postgres
 psql
 
-CREATE ROLE maximka WITH LOGIN PASSWORD 'Zip906kool9';
+CREATE ROLE maximka WITH LOGIN PASSWORD 'maxypayne';
 
 CREATE DATABASE books;
 \c books
