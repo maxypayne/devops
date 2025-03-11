@@ -1,0 +1,153 @@
+
+stages:
+  - test
+  - build
+  - deploy
+  - deploy_to_vm
+
+variables:
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+  NEXUS_URL: "$NEXUS_URL"
+  NEXUS_USERNAME: "$NEXUS_USERNAME"
+  NEXUS_PASSWORD: "$NEXUS_PASSWORD"
+
+before_script:
+#  - apt-get update && apt-get install -y openjdk-21-jdk
+#  - export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+#  - export PATH=$JAVA_HOME/bin:$PATH
+#  - echo "JAVA_HOME=$JAVA_HOME"
+  - chmod +x gradlew  # Ensure Gradle wrapper is executable
+
+test:
+  stage: test
+  tags:
+    - awesome
+  script:
+    - ./gradlew test
+    - ./gradlew --version
+
+build:
+  stage: build
+  tags:
+    - awesome
+  script:
+    - ./gradlew clean build -x test
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 1 hour
+
+deploy:
+  stage: deploy
+  tags:
+    - awesome
+  only:
+    - develop
+  script:
+    - ./gradlew publish
+  dependencies:
+    - build
+
+
+## This file is a template, and might need editing before it works on your project.
+## To contribute improvements to CI/CD templates, please follow the Development guide at:
+## https://docs.gitlab.com/ee/development/cicd/templates.html
+## This specific template is located at:
+## https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
+#
+## This is a sample GitLab CI/CD configuration file that should run without any modifications.
+## It demonstrates a basic 3 stage CI/CD pipeline. Instead of real tests or scripts,
+## it uses echo commands to simulate the pipeline execution.
+##
+## A pipeline is composed of independent jobs that run scripts, grouped into stages.
+## Stages run in sequential order, but jobs within stages run in parallel.
+##
+## For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
+#default:
+#  tags:
+#    - awesome
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "develop"'
+#
+#stages:          # List of stages for jobs, and their order of execution
+#  - build
+#  - test
+#  - deploy
+#
+#variables:
+#  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+#  NEXUS_URL: "$NEXUS_URL"
+#  NEXUS_USERNAME: "$NEXUS_USERNAME"
+#  NEXUS_PASSWORD: "$NEXUS_PASSWORD"
+#
+#cache:
+#  key: gradle
+#  paths:
+#    - .gradle/wrapper/
+#    - .gradle/caches/
+#
+#build:
+#  stage: build
+#  image: gradle:jdk21
+#  script:
+#    - ./gradlew clean build -x test
+#  artifacts:
+#    paths:
+#      - build/libs/*.jar
+#    expire_in: 1 hour
+#
+#include:
+#  - template: Security/Dependency-Scanning.gitlab-ci.yml
+#
+#test:
+#  stage: test
+#  image: gradle:jdk21
+#  tags:
+#    - awesome
+#  script:
+#    - ./gradlew test
+#
+#deploy:
+#  stage: deploy
+#  image: gradle:jdk21
+#  tags:
+#    - awesome
+#  only:
+#    - develop
+#  script:
+#    - ./gradlew publish
+#  dependencies:
+#    - build
+##
+##build-job:       # This job runs in the build stage, which runs first.
+##  stage: build
+##  script:
+##    - echo "Compiling the code..."
+##    - echo "Compile complete."
+##
+##unit-test-job:   # This job runs in the test stage.
+##  stage: test    # It only starts when the job in the build stage completes successfully.
+##  tags:
+##    - awesome
+##  script:
+##    - echo "Running unit tests... This will take about 60 seconds."
+##    - sleep 60
+##    - echo "Code coverage is 90%"
+##
+##lint-test-job:   # This job also runs in the test stage.
+##  stage: test    # It can run at the same time as unit-test-job (in parallel).
+##  tags:
+##    - awesome
+##  script:
+##    - echo "Linting code... This will take about 10 seconds."
+##    - sleep 10
+##    - echo "No lint issues found."
+##
+##deploy-job:      # This job runs in the deploy stage.
+##  environment: production
+##  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+##  tags:
+##    - awesome
+##  script:
+##    - echo "Deploying application..."
+##    - echo "Application successfully deployed."
